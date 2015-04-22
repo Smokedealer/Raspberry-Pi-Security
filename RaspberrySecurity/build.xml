@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Autor: Matěj Kareš A12B0078P, email: karesm@students.zcu.cz -->
+<project name="security" default="distjar">
+    <description>
+    </description>
+
+    <property name="app.name" value="Security"/>
+    <property name="src.dir" value="./src"/>
+    <property name="build.dir" value="./bin"/>
+    <property name="lib.dir" value="./lib"/>
+    <property name="jar.dir" value="./jar"/>
+    <property name="bin.jar.file" value="bp.jar"/>
+    <property name="main-class" value="security.Main"/>
+
+    <path id="external.jars">
+        <fileset dir="${lib.dir}" includes="**/*.jar"/>
+    </path>
+
+    <path id="classpath">
+        <pathelement location="${build.dir}"/>
+	<path refid="external.jars" />
+    </path>
+
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+        <delete dir="${jar.dir}"/>
+    </target>
+
+
+    <target name="compile">
+        <mkdir dir="${build.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" encoding="UTF-8">
+            <classpath refid="classpath"/>
+        </javac>
+    </target>
+
+
+    <target name="run" depends="compile">
+        <java classname="${main-class}" fork="true" dir="${build.dir}">
+            <classpath refid="classpath"/>
+        </java>
+    </target>
+
+
+    <target name="distjar" depends="compile">
+        <mkdir dir="${jar.dir}"/>
+
+        <jar destfile="${jar.dir}/${bin.jar.file}" basedir="${build.dir}">
+            <zipgroupfileset dir="${lib.dir}" includes="*.jar"/>
+            <manifest>
+                <attribute name="Main-Class" value="${main-class}"/>
+            </manifest>
+        </jar>
+    </target>
+
+
+
+
+</project>
