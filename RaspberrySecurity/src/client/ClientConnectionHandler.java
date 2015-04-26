@@ -8,6 +8,10 @@ import java.io.PrintStream;
 import java.net.Socket;
 
 public class ClientConnectionHandler{
+	private String host;
+	
+	private int port;
+	
 	private Socket socket;
 	
 	private BufferedReader inStream;
@@ -21,10 +25,13 @@ public class ClientConnectionHandler{
 	private ClientConnectionListener connectionListener;
 	
 	public ClientConnectionHandler(String host, int port) {
-		connect(host, port);
+		this.host = host;
+		this.port = port;
+		
+		//connect(host, port);
 	}
 
-	private void connect(String host, int port) {
+	public boolean connect() {
 		try {
 			
 			System.out.println("Connecting to " + host + ":" + port + ".");
@@ -39,10 +46,11 @@ public class ClientConnectionHandler{
 			connectionListener.start();
 			
 			new ClientCommandPrompt(outObjectStream).start();
-			
+			return true;
 		} catch (IOException e) {
 			System.out.println("(-) Could not connect to the " + host + ":" + port);
 			e.printStackTrace();
+			return false;
 		}
 	}
 	

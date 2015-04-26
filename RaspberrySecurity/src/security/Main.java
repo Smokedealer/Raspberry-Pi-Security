@@ -1,13 +1,14 @@
 package security;
 
 import java.awt.Dimension;
+import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.util.Scanner;
+
+import javax.imageio.ImageIO;
+
+import client.ClientConnectionHandler;
 
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamMotionDetector;
@@ -28,6 +29,8 @@ public class Main {
 	
 	static StartupSettings settings;
 	
+	static ClientConnectionHandler clientHandler;
+	
 	static Scanner sc;
 	
 	public static void main(String[] args) throws IOException {
@@ -43,13 +46,21 @@ public class Main {
 			return;
 		}
 		
-		loadSettings(webcam);
+		if(args.length > 0 && args[0].equals("-r")){
+			settings = new StartupSettings();
+			startUpManager(webcam);
+		}
 		
+		loadSettings(webcam);
+			
 		webcam.open();
 		
 		detectMotion(webcam);
 		
 		if(settings.isGui()) new GUI("Security Panel", webcam);
+		else{
+			System.out.println("Running...");
+		}
 	}
 	
 	
@@ -61,7 +72,8 @@ public class Main {
 			startUpManager(webcam);
 		}else{
 			webcam.setViewSize(settings.getResolution());
-			
+			clientHandler = new ClientConnectionHandler(settings.getServer(), settings.getPort());
+			clientHandler.connect();
 		}
 	}
 
@@ -69,9 +81,59 @@ public class Main {
 	private static void startUpManager(Webcam webcam) {
 		setResolution(webcam);
 		setGui();
+		setConnection();
 		settings.save();
 	}
 	
+	private static void setConnection() {
+		while (true){
+			System.out.println("Do you want to connect to remote server? [y/n]");
+
+			String choice = sc.nextLine();
+			
+			if(choice.equals("y")){
+				System.out.print("Enter the IP address or Hostname of the server: ");
+				String address = sc.nextLine();
+				
+				int port;
+				while(true){
+					try {
+						System.out.print("Enter the port: ");
+						port = sc.nextInt();
+						sc.nextLine();
+						
+						if(port < 0 || port > 65535){
+							System.out.println("Port out of range (0 - 65536).");
+							continue;
+						}
+						
+						System.out.println("Port set to " + port);
+						
+						break;
+					} catch (Exception e) {
+						sc.nextLine();
+						System.out.println("Invalid input.");
+						continue;
+					}
+				}
+				
+				settings.setServer(address);
+				settings.setPort(port);
+				settings.setSend(true);
+				
+				System.out.println("Connection to server enabled.");
+				break;
+			}else if(choice.equals("n")){
+				settings.setSend(false);
+				System.out.println("");
+				break;
+			}else{
+				System.out.println("Invalid choice.");
+			}
+		}
+	}
+
+
 	private static void setGui() {
 		while (true){
 			System.out.println("Do you want to show GUI? [y/n]");
@@ -94,7 +156,7 @@ public class Main {
 
 
 	public static void setResolution(Webcam webcam){
-		System.out.println("Type in number of desired resolution: ");
+		System.out.println("Type in the number of desired resolution: ");
 		
 		int i = 1;
 		for(Dimension d : webcam.getViewSizes()){

@@ -94,7 +94,9 @@ public class GUI extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					ImageIO.write(webcam.getImage(), "PNG", new File("snap-" + System.currentTimeMillis() + ".png"));
+					long time =  System.currentTimeMillis();
+					ImageIO.write(webcam.getImage(), "JPG", new File("snap-" + time + ".jpg"));
+					System.out.println("Snapshot has been saved to snap-" + time + ".jpg");
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
@@ -156,20 +158,6 @@ public class GUI extends JFrame {
 		
 		JScrollPane scrollPane = new JScrollPane();
 		DefaultListModel<String> model = new DefaultListModel<String>();
-		model.addElement("14.12.2015 14:30:15");
-		model.addElement("14.12.2015 14:30:15");
-		model.addElement("14.12.2015 14:30:15");
-		model.addElement("14.12.2015 14:30:15");
-		model.addElement("14.12.2015 14:30:15");
-		model.addElement("14.12.2015 14:30:15");
-		model.addElement("14.12.2015 14:30:15");
-		model.addElement("14.12.2015 14:30:15");
-		model.addElement("14.12.2015 14:30:15");
-		model.addElement("14.12.2015 14:30:15");
-		model.addElement("14.12.2015 14:30:15");
-		model.addElement("14.12.2015 14:30:15");
-		model.addElement("14.12.2015 14:30:15");
-		model.addElement("14.12.2015 14:30:15");
 		events = new JList<String>(model);
 		scrollPane.setViewportView(events);
 		gbc.fill = GridBagConstraints.BOTH;
