@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Scanner;
 
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 
 import client.ClientConnectionHandler;
 
@@ -24,8 +25,7 @@ public class Main {
 	    Webcam.setDriver(new V4l4jDriver());
 	}*/
 	
-	
-	static int pocet = 0;
+	static File outFile;
 	
 	static StartupSettings settings;
 	
@@ -47,9 +47,11 @@ public class Main {
 		}
 		
 		if(args.length > 0 && args[0].equals("-r")){
-			settings = new StartupSettings();
 			startUpManager(webcam);
 		}
+		
+		outFile = new File("./pictures");
+		outFile.mkdirs();
 		
 		loadSettings(webcam);
 			
@@ -72,16 +74,22 @@ public class Main {
 			startUpManager(webcam);
 		}else{
 			webcam.setViewSize(settings.getResolution());
-			clientHandler = new ClientConnectionHandler(settings.getServer(), settings.getPort());
-			clientHandler.connect();
+			
+			if(settings.isSend()){
+				clientHandler = new ClientConnectionHandler(settings.getServer(), settings.getPort());
+				clientHandler.connect();
+			}
 		}
 	}
 
 
 	private static void startUpManager(Webcam webcam) {
+		settings = new StartupSettings();
+		
 		setResolution(webcam);
 		setGui();
 		setConnection();
+		
 		settings.save();
 	}
 	
@@ -197,14 +205,23 @@ public class Main {
 	private static void detectMotion(final Webcam webcam){
 		WebcamMotionDetector wmd = new WebcamMotionDetector(webcam);
 		
-		wmd.setInterval(100);
+		wmd.setInterval(500);
 		
 		wmd.addMotionListener(new WebcamMotionListener() {
 			
 			@Override
 			public void motionDetected(WebcamMotionEvent arg0) {
-				pocet++;
-				System.out.println("Motion detected!! " + pocet);
+				
+				clientHandler.getConnectionListener().sendPicture(new ImageIcon(webcam.getImage()));
+				/*
+				try {
+					ImageIO.write(webcam.getImage(), "jpg", new File("./pictures/img-" + System.currentTimeMillis() + ".jpg"));
+					System.out.println("Image saved.");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				*/
 			}
 		});
 		

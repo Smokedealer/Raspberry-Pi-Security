@@ -98,7 +98,7 @@ public class ServerConnectionListener extends Thread {
 	private void imgReceived(ImageIcon icon){
 		try {
 			BufferedImage buffImg = toBufferedImage(icon.getImage());
-			ImageIO.write(buffImg, "jpg", new File("pictures/prijato.jpg"));
+			ImageIO.write(buffImg, "jpg", new File("/var/www/actImage/img.jpg"));
 			System.out.println("(+) Picture succesfully saved.");
 		} catch (IOException e) {
 			System.out.println("(-) Error converting incoming message.");
