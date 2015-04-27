@@ -1,6 +1,6 @@
 package server;
 
-import java.awt.Graphics2D;
+import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
@@ -23,6 +23,8 @@ public class ServerConnectionListener extends Thread {
 	
 	BufferedReader inStream;
 	PrintStream outStream;
+	
+	BufferedImage bimage;
 	
 	boolean stop;
 	
@@ -53,16 +55,19 @@ public class ServerConnectionListener extends Thread {
 
 	public void run() {
 		stop = false;
+		NetworkMessage msg;
 		
 		while(!stop){
 			try {
 				System.out.println("Waiting for message...");
-				NetworkMessage msg = (NetworkMessage)(inObjectStream.readObject());
+				//msg = (NetworkMessage)(inObjectStream.readObject());
+				msg = (NetworkMessage)(inObjectStream.readUnshared());
 				
 				if(msg == null) close();
 				
 				parseMessage(msg);
 				
+				System.gc();
 			} catch (ClassNotFoundException | IOException e) {
 				close();
 				System.out.println("(-) Error reading incoming message.");
@@ -97,8 +102,8 @@ public class ServerConnectionListener extends Thread {
 	
 	private void imgReceived(ImageIcon icon){
 		try {
-			BufferedImage buffImg = toBufferedImage(icon.getImage());
-			ImageIO.write(buffImg, "jpg", new File("/var/www/actImage/img.jpg"));
+			BufferedImage buffImg = toBufferedImage(icon);
+			ImageIO.write(buffImg, "png", new File("/var/www/actImage/img.png"));
 			System.out.println("(+) Picture succesfully saved.");
 		} catch (IOException e) {
 			System.out.println("(-) Error converting incoming message.");
@@ -107,28 +112,22 @@ public class ServerConnectionListener extends Thread {
 	}
 	
 	private void cmdReceived(String command){
-		
+		//TODO 
 	}
 	
 	
-	public BufferedImage toBufferedImage(Image img)
+	public BufferedImage toBufferedImage(ImageIcon icon)
 	{
-	    if (img instanceof BufferedImage)
-	    {
-	        return (BufferedImage) img;
-	    }
-
-	    // Create a buffered image with transparency
-	    BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-
-	    // Draw the image on to the buffered image
-	    Graphics2D bGr = bimage.createGraphics();
-	    bGr.drawImage(img, 0, 0, null);
-	    bGr.dispose();
-
-	    // Return the buffered image
-	    return bimage;
+		BufferedImage bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_RGB);
+		Graphics g = bi.createGraphics();
+		icon.paintIcon(null, g, 0,0);
+		g.dispose();
+			
+			return bi;
 	}
+	
+	
+	
 	
 	private void close(){
 		System.out.println("Logging out.");

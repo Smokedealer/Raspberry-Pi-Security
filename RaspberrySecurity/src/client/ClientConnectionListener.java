@@ -54,7 +54,9 @@ public class ClientConnectionListener extends Thread {
 		
 			System.out.println("Sending image.");
 			NetworkMessage msg = new NetworkMessage(img);
-			outObjectStream.writeObject(msg);
+			//outObjectStream.writeObject(msg);
+			outObjectStream.writeUnshared(msg);
+			outObjectStream.reset();
 			System.out.println("(+) Image sent.");
 	
 		} catch (IOException e) {

@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
 
 import javax.imageio.ImageIO;
@@ -212,16 +214,18 @@ public class Main {
 			@Override
 			public void motionDetected(WebcamMotionEvent arg0) {
 				
-				clientHandler.getConnectionListener().sendPicture(new ImageIcon(webcam.getImage()));
-				/*
-				try {
-					ImageIO.write(webcam.getImage(), "jpg", new File("./pictures/img-" + System.currentTimeMillis() + ".jpg"));
-					System.out.println("Image saved.");
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				if(settings.send){
+					clientHandler.getConnectionListener().sendPicture(new ImageIcon(webcam.getImage()));
+				}else{
+					try {
+						Date date = new Date();
+						SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy---kk-mm-ss");
+						ImageIO.write(webcam.getImage(), "jpg", new File("./pictures/" + dateFormat.format(date) + ".jpg"));
+						System.out.println("Image saved.");
+					} catch (IOException e) {
+						System.out.println("(-) Failed to save the image.");
+					}
 				}
-				*/
 			}
 		});
 		
@@ -229,5 +233,8 @@ public class Main {
 	}
 	
 
+	public void getRekt(){
+		System.out.println("REKT... U MAD BRO?");
+	}
 
 }
