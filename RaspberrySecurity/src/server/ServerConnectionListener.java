@@ -10,16 +10,23 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
+/**
+ * 
+ * @author Matìj Kareš, karesm@students.zcu.cz
+ *
+ */
 public class ServerConnectionListener extends Thread {
 	private Socket clientSocket;
 	
 	ObjectInputStream inObjectStream;
 	ObjectOutputStream outObjectStream;
 	
+	ServerConnectionHandler connectionHandler;
 	
 	BufferedReader inStream;
 	PrintStream outStream;
@@ -28,8 +35,9 @@ public class ServerConnectionListener extends Thread {
 	
 	boolean stop;
 	
-	public ServerConnectionListener(Socket clientSocket) {
+	public ServerConnectionListener(Socket clientSocket, ServerConnectionHandler connectionHandler) {
 		this.clientSocket = clientSocket;
+		this.connectionHandler = connectionHandler;
 		
 		openStreams();
 	}
@@ -60,7 +68,6 @@ public class ServerConnectionListener extends Thread {
 		while(!stop){
 			try {
 				System.out.println("Waiting for message...");
-				//msg = (NetworkMessage)(inObjectStream.readObject());
 				msg = (NetworkMessage)(inObjectStream.readUnshared());
 				
 				if(msg == null) close();
@@ -83,7 +90,7 @@ public class ServerConnectionListener extends Thread {
 		switch (msg.getMsgType()){
 			case NetworkMessage.PICTURE:
 				System.out.println("Message is a picture.");
-				imgReceived(msg.getImageIcon());
+				imgReceived(msg);
 				break;
 			
 			case NetworkMessage.COMMAND:
@@ -100,10 +107,19 @@ public class ServerConnectionListener extends Thread {
 	}
 	
 	
-	private void imgReceived(ImageIcon icon){
+	private void imgReceived(NetworkMessage msg){
+		ImageIcon icon = msg.getImageIcon();
 		try {
 			BufferedImage buffImg = toBufferedImage(icon);
-			ImageIO.write(buffImg, "png", new File("/var/www/actImage/img.png"));
+			File actImagePath = new File(connectionHandler.getWwwPath() + "actImage/img.jpg");
+			actImagePath.mkdirs();
+			ImageIO.write(buffImg, "png", actImagePath);
+			
+			SimpleDateFormat folderFormat = new SimpleDateFormat("dd-MM-yyyy");
+			SimpleDateFormat fileFormat = new SimpleDateFormat("kk-mm-ss");
+			File archivePath = new File(connectionHandler.getWwwPath() + "archive/" + (folderFormat.format(msg.getDate())) + "/" + (fileFormat.format(msg.getDate())) + ".png");
+			archivePath.mkdirs();
+			ImageIO.write(buffImg, "png", archivePath);
 			System.out.println("(+) Picture succesfully saved.");
 		} catch (IOException e) {
 			System.out.println("(-) Error converting incoming message.");
@@ -112,7 +128,8 @@ public class ServerConnectionListener extends Thread {
 	}
 	
 	private void cmdReceived(String command){
-		//TODO 
+		//TODO n
+		
 	}
 	
 	

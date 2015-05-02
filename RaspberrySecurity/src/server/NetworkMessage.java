@@ -1,6 +1,7 @@
 package server;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.swing.ImageIcon;
 
@@ -16,20 +17,23 @@ public class NetworkMessage implements Serializable{
 	private int msgType;
 	private String command;
 	private ImageIcon img;
+	private Date date;
 	
 	
 	public NetworkMessage(String command) {
-		this(NetworkMessage.COMMAND, command, null);
+		this(NetworkMessage.COMMAND, command, null, null);
 	}
 	
 	public NetworkMessage(ImageIcon img) {
-		this(NetworkMessage.PICTURE, null, img);
+		this(NetworkMessage.PICTURE, null, img, new Date());
+		
 	}
 	
-	public NetworkMessage(int msgType, String command, ImageIcon img) {
+	public NetworkMessage(int msgType, String command, ImageIcon img, Date date) {
 		setMsgType(msgType);
 		setCommand(command);
 		setImg(img);
+		setDate(date);
 	}
 
 	public int getMsgType() {
@@ -54,6 +58,14 @@ public class NetworkMessage implements Serializable{
 
 	public void setImg(ImageIcon img) {
 		this.img = img;
+	}
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
 	}
 	
 	

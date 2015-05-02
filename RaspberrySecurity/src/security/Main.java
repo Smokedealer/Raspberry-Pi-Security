@@ -79,7 +79,11 @@ public class Main {
 			
 			if(settings.isSend()){
 				clientHandler = new ClientConnectionHandler(settings.getServer(), settings.getPort());
-				clientHandler.connect();
+				boolean connected = clientHandler.connect();
+				if(!connected){
+					System.out.println("Connection could not be astablished. Server unreachable.");
+					settings.setSend(false);
+				}
 			}
 		}
 	}
@@ -135,7 +139,6 @@ public class Main {
 				break;
 			}else if(choice.equals("n")){
 				settings.setSend(false);
-				System.out.println("");
 				break;
 			}else{
 				System.out.println("Invalid choice.");
@@ -214,7 +217,7 @@ public class Main {
 			@Override
 			public void motionDetected(WebcamMotionEvent arg0) {
 				
-				if(settings.send){
+				if(settings.isSend()){
 					clientHandler.getConnectionListener().sendPicture(new ImageIcon(webcam.getImage()));
 				}else{
 					try {
@@ -231,10 +234,17 @@ public class Main {
 		
 		wmd.start();
 	}
-	
 
-	public void getRekt(){
-		System.out.println("REKT... U MAD BRO?");
+
+	public static StartupSettings getSettings() {
+		return settings;
 	}
 
+
+	public static void setSettings(StartupSettings settings) {
+		Main.settings = settings;
+	}
+
+	
+	
 }
