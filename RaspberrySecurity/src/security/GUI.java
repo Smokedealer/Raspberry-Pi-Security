@@ -7,9 +7,13 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+
+import javafx.scene.control.SelectionModel;
 
 import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
@@ -19,7 +23,10 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.Timer;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamPanel;
@@ -43,8 +50,8 @@ public class GUI extends JFrame {
 	
 	JButton snap;
 	JLabel cameraLabel, fpsLabel, resolutionLabel, connectedLabel, portLabel, eventsLabel;
-	JList<String> events;
-	DefaultListModel<String> model;
+	JList<SecurityEvent> events;
+	DefaultListModel<SecurityEvent> model;
 	
 	
 	/**Constructor
@@ -181,8 +188,35 @@ public class GUI extends JFrame {
 		controlPanel.add(eventsLabel, gbc);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		model = new DefaultListModel<String>();
-		events = new JList<String>(model);
+		model = new DefaultListModel<SecurityEvent>();
+		events = new JList<SecurityEvent>(model);
+		events.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
+		frame.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if(!events.contains(e.getPoint())){
+					events.clearSelection();
+					webcamPanel.resume();
+				}
+			}
+		});
+		
+		events.addListSelectionListener(new ListSelectionListener() {
+			
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				if(events.getSelectedIndex() < 0){
+					webcamPanel.resume();
+					return;
+				}else{
+					webcamPanel.pause();
+				}
+				
+				webcamPanel.getGraphics().drawImage(events.getSelectedValue().getEventImage(), 0, 0, 640, 480, null);
+			}
+		});
+		
 		scrollPane.setViewportView(events);
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.gridx = 0;
@@ -199,7 +233,7 @@ public class GUI extends JFrame {
 	 * @param se - security event
 	 */
 	public void addEvent(SecurityEvent se){
-		SimpleDateFormat sdf = new SimpleDateFormat("kk.MM.ss");
-		model.addElement(sdf.format(se.getEventTime()) + " - Motion");
+		model.add(0, se);
+		if(model.size() > 20) model.remove(20);
 	}
 }
