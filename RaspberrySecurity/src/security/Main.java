@@ -69,6 +69,10 @@ public class Main {
 		
 		if(args.length > 0 && args[0].equals("-r")){
 			startUpManager(webcam);
+		}else if(args.length > 0 && args[0].equals("-h")){
+			System.out.println("Help: Start the program with -r to delete old settings and input new.");
+			System.out.println("Example: java -jar ./monitor.jar -r");
+			return;
 		}
 		
 		outFile = new File("./pictures");
