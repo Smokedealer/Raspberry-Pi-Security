@@ -5,6 +5,13 @@ import java.util.Date;
 
 import javax.swing.ImageIcon;
 
+/**
+ * This class makes objects that can be sent through the network. Every object holds message type, image, command and date
+ * (at least those that had been provided)  
+ * 
+ * @author Matej Kares, karesm@students.zcu.cz
+ *
+ */
 public class NetworkMessage implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
@@ -29,6 +36,13 @@ public class NetworkMessage implements Serializable{
 		
 	}
 	
+	/**Constructor
+	 * 
+	 * @param msgType
+	 * @param command
+	 * @param img
+	 * @param date
+	 */
 	public NetworkMessage(int msgType, String command, ImageIcon img, Date date) {
 		setMsgType(msgType);
 		setCommand(command);

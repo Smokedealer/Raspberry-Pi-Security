@@ -10,20 +10,43 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+/**Class for holding user setting. Class is responsible for loading saved settings and for saving user specified settings.
+ * 
+ * @author Matej Kares, karesm@students.zcu.cz
+ *
+ */
 public class StartupSettings implements Serializable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 4123877317857569136L;
 	
-	private static String iniFile = "settings.ini";
+	/**
+	 * Settings file (cannot be edited directly by the user)
+	 */
+	private static String iniFile = "settings";
 
+	/** Resolution for the camera to use */
 	Dimension resolution;
+	
+	/** Whether to show GUI or not */
 	boolean gui;
+	
+	/** The server to connect to */
 	String server;
+	
+	/** Port the server is listening on */
 	int port;
+	
+	/** Whether to send or keep data locally */
 	boolean send;
 
+	
+	/**
+	 * Loads the settings from the file
+	 * 
+	 * @return loaded settings
+	 */
 	public static StartupSettings load() {
 		try {
 			ObjectInputStream loader = new ObjectInputStream(new FileInputStream(new File(iniFile)));
@@ -40,6 +63,10 @@ public class StartupSettings implements Serializable {
 		return null;
 	}
 
+	
+	/**
+	 * Saves the actual state of settings
+	 */
 	public void save() {
 		try {
 			ObjectOutputStream saver = new ObjectOutputStream(new FileOutputStream(new File(iniFile)));

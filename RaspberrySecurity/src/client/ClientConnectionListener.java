@@ -9,16 +9,28 @@ import javax.swing.ImageIcon;
 import security.Main;
 import server.NetworkMessage;
 
+/**Listens for incoming messages and behaves accordingly to them. 
+ * 
+ * @author Matej Kares, karesm@students.zcu.cz
+ *
+ */
 public class ClientConnectionListener extends Thread {
-	
+	/** Input Object Stream */
 	private ObjectInputStream inObjectStream;
 	
+	/** Output Object Stream */
 	private ObjectOutputStream outObjectStream;
 	
+	/** Handler associated to this listener */
 	private ClientConnectionHandler connectionHandler;
 	
+	/** If true this listener stops to listen for incoming messages */
 	boolean stop;
 	
+	/**Constructor
+	 * 
+	 * @param connectionHandler
+	 */
 	public ClientConnectionListener(ClientConnectionHandler connectionHandler) {
 		this.connectionHandler = connectionHandler;
 		inObjectStream = connectionHandler.getInObjectStream();
@@ -27,7 +39,9 @@ public class ClientConnectionListener extends Thread {
 	}
 	
 	
-	
+	/**
+	 * Cycle for receiving messages and passing them to the parser.
+	 */
 	public void run() {
 		while(!stop){
 			try {
@@ -48,7 +62,9 @@ public class ClientConnectionListener extends Thread {
 		}
 	}
 	
-	
+	/**
+	 * Closes all streams and socket itself. Switches the destination of saved files to the local file system.
+	 */
 	private void close(){
 		System.out.println("Logging out.");
 		try { 
@@ -74,20 +90,23 @@ public class ClientConnectionListener extends Thread {
 	}
 	
 	
+	
 	private void parseMessage(NetworkMessage msg) {
 		if(msg.getMsgType() != NetworkMessage.COMMAND) return;
 		
-		//TODO parse commands
+		//Not used, only for future expansions
 	}
 
 
-
+	/**Sends the image to the server.
+	 * 
+	 * @param img
+	 */
 	public void sendPicture(ImageIcon img){
 		try {
 		
 			System.out.println("Sending image.");
 			NetworkMessage msg = new NetworkMessage(img);
-			//outObjectStream.writeObject(msg);
 			outObjectStream.writeUnshared(msg);
 			outObjectStream.reset();
 			System.out.println("(+) Image sent.");

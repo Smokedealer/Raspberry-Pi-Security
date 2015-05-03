@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 
 import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
@@ -23,6 +24,11 @@ import javax.swing.Timer;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamPanel;
 
+/**Creates simple GUI for the application
+ * 
+ * @author Matej Kares, karesm@students.zcu.cz
+ *
+ */
 public class GUI extends JFrame {
 	
 	/**
@@ -38,9 +44,16 @@ public class GUI extends JFrame {
 	JButton snap;
 	JLabel cameraLabel, fpsLabel, resolutionLabel, connectedLabel, portLabel, eventsLabel;
 	JList<String> events;
+	DefaultListModel<String> model;
 	
 	
-
+	/**Constructor
+	 * 
+	 * builds the whole frame. Sets the refresh timer to 1s (for FPS).
+	 * 
+	 * @param title - title of the frame
+	 * @param webcam - which camera to use
+	 */
 	public GUI(String title, Webcam webcam) {
 		frame = this;
 		this.webcam = webcam;
@@ -80,10 +93,16 @@ public class GUI extends JFrame {
 		t.start();
 	}
 	
+	/**
+	 * Refreshes information on the control panel
+	 */
 	private void refreshPanel(){
 		fpsLabel.setText("FPS " + webcam.getFPS());
 	}
 	
+	/**
+	 * Initializes all components needed for GUI. Using GridBag Layout.
+	 */
 	private void initItems(){
 		GridBagConstraints gbc = new GridBagConstraints();
 		
@@ -132,7 +151,10 @@ public class GUI extends JFrame {
         gbc.insets = new Insets(10, 10, 0, 0);
 		controlPanel.add(resolutionLabel, gbc);
 		
-		connectedLabel = new JLabel("Server: ");
+		String server = Main.getSettings().server != null ? Main.getSettings().getServer() : "None";
+		
+		
+		connectedLabel = new JLabel("Server: " + server);
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridx = 0;
         gbc.gridy = 4;
@@ -140,7 +162,9 @@ public class GUI extends JFrame {
         gbc.insets = new Insets(10, 10, 0, 0);
 		controlPanel.add(connectedLabel, gbc);
 		
-		portLabel = new JLabel("Port: ");
+		
+		
+		portLabel = new JLabel("Port: " + (Main.getSettings().port > 0 ? Main.getSettings().getPort() : "None"));
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridx = 0;
         gbc.gridy = 5;
@@ -157,7 +181,7 @@ public class GUI extends JFrame {
 		controlPanel.add(eventsLabel, gbc);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		DefaultListModel<String> model = new DefaultListModel<String>();
+		model = new DefaultListModel<String>();
 		events = new JList<String>(model);
 		scrollPane.setViewportView(events);
 		gbc.fill = GridBagConstraints.BOTH;
@@ -168,5 +192,14 @@ public class GUI extends JFrame {
         gbc.insets = new Insets(10, 10, 10, 10);
 		controlPanel.add(scrollPane, gbc);
 		
+	}
+	
+	/**Adds event to the list
+	 * 
+	 * @param se - security event
+	 */
+	public void addEvent(SecurityEvent se){
+		SimpleDateFormat sdf = new SimpleDateFormat("kk.MM.ss");
+		model.addElement(sdf.format(se.getEventTime()) + " - Motion");
 	}
 }

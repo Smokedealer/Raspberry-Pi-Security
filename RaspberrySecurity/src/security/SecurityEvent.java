@@ -3,10 +3,20 @@ package security;
 import java.awt.image.BufferedImage;
 import java.util.Date;
 
+/**Holds date of event and picture of the event
+ * 
+ * @author Matej Kares, karesm@students.zcu.cz
+ *
+ */
 public class SecurityEvent {
 	private BufferedImage eventImage;
 	private Date eventTime;
 	
+	/**Constructor
+	 * 
+	 * @param img - of the event
+	 * @param date - of the event
+	 */
 	public SecurityEvent(BufferedImage img, Date date) {
 		eventImage = img;
 		eventTime = date;

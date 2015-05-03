@@ -7,30 +7,51 @@ import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.net.Socket;
 
+/**Class responsible for establishing and retaining connection to the server.
+ * 
+ * @author Matej Kares, karesm@students.zcu.cz
+ *
+ */
 public class ClientConnectionHandler{
+	/** Host or IP address */
 	private String host;
 	
+	/** Port on the server */
 	private int port;
 	
+	/** Created socket */
 	private Socket socket;
 	
+	/** Input stream */
 	private BufferedReader inStream;
 	
+	/** Output stream */
 	private PrintStream outStream;
 	
+	/** Input Object stream */
 	private ObjectInputStream inObjectStream;
 	
+	/** Output Object stream */
 	private ObjectOutputStream outObjectStream;
 	
+	/** Associated listener */
 	private ClientConnectionListener connectionListener;
 	
+	/**Constructor
+	 * 
+	 * @param host
+	 * @param port
+	 */
 	public ClientConnectionHandler(String host, int port) {
 		this.host = host;
 		this.port = port;
-		
-		//connect(host, port);
 	}
 
+	
+	/** Connects to the server
+	 * 
+	 * @return true if connection was successful
+	 */
 	public boolean connect() {
 		try {
 			
@@ -55,6 +76,9 @@ public class ClientConnectionHandler{
 	}
 	
 	
+	/**
+	 * Opens the input and output streams
+	 */
 	private void openStreams() {
 		try {
 			System.out.println("Opening object output stream.");

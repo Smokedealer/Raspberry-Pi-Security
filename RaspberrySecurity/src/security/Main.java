@@ -20,21 +20,40 @@ import com.github.sarxos.webcam.WebcamMotionListener;
 import com.github.sarxos.webcam.ds.v4l4j.V4l4jDriver;
 
 
-
+/**The core of the application. Handles the user settings, motion detection and offers GUI.
+ * 
+ * @author Matej Kares, karesm@students.zcu.cz
+ *
+ */
 public class Main {
-/*
-	static {
-	    Webcam.setDriver(new V4l4jDriver());
-	}*/
 	
+	/**
+	 * Sets the driver responsible for accessing the camera.
+	 */
+	static {
+		/*Uncomment on Raspberry Pi. Comment else.*/
+		
+	    //Webcam.setDriver(new V4l4jDriver());
+	}
+	
+	/** Folder for pictures to be saved while not connected to the server */
 	static File outFile;
 	
+	/** Object holds the information about the settings of the application */
 	static StartupSettings settings;
 	
+	/** Connection handler reference */
 	static ClientConnectionHandler clientHandler;
 	
+	/** Scanner for user input */
 	static Scanner sc;
 	
+	
+	/**Call all the necessary methods to start the application
+	 * 
+	 * @param args
+	 * @throws IOException
+	 */
 	public static void main(String[] args) throws IOException {
 		sc = new Scanner(System.in);
 		
@@ -68,6 +87,11 @@ public class Main {
 	}
 	
 	
+	
+	/**Loads the preset settings
+	 * 
+	 * @param webcam
+	 */
 	private static void loadSettings(Webcam webcam) {
 		settings = StartupSettings.load();
 		
@@ -88,7 +112,10 @@ public class Main {
 		}
 	}
 
-
+	
+	/**
+	 * Gets the information about settings from user.
+	 */
 	private static void startUpManager(Webcam webcam) {
 		settings = new StartupSettings();
 		
@@ -99,6 +126,11 @@ public class Main {
 		settings.save();
 	}
 	
+	
+	
+	/**
+	 * Wizard for setting the connection to the server
+	 */
 	private static void setConnection() {
 		while (true){
 			System.out.println("Do you want to connect to remote server? [y/n]");
@@ -146,7 +178,10 @@ public class Main {
 		}
 	}
 
-
+	
+	/**
+	 * Asks the user whether they want GUI or not. Sets the application accordingly.
+	 */
 	private static void setGui() {
 		while (true){
 			System.out.println("Do you want to show GUI? [y/n]");
@@ -168,6 +203,11 @@ public class Main {
 	}
 
 
+	/**Gets all the available resolution on specified webcam and let's the user to chose one of them.
+	 * Sets the application accordingly.
+	 * 
+	 * @param webcam
+	 */
 	public static void setResolution(Webcam webcam){
 		System.out.println("Type in the number of desired resolution: ");
 		
@@ -206,7 +246,12 @@ public class Main {
 		settings.setResolution(selected);
 	}
 
-
+	
+	/**
+	 * Method responsible for catching motion from captured images.
+	 * 
+	 * @param webcam
+	 */
 	private static void detectMotion(final Webcam webcam){
 		WebcamMotionDetector wmd = new WebcamMotionDetector(webcam);
 		

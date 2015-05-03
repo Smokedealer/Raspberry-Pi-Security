@@ -15,26 +15,40 @@ import java.text.SimpleDateFormat;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
-/**
+/** Listens for incoming messages from associated client and sorts received images
+ * to subfolders. 
  * 
- * @author Matìj Kareš, karesm@students.zcu.cz
+ * @author Matej Kares, karesm@students.zcu.cz
  *
  */
 public class ServerConnectionListener extends Thread {
+	/** The socket of the client this listener belongs to  */
 	private Socket clientSocket;
 	
+	/** Stream for receiving objects */
 	ObjectInputStream inObjectStream;
+
+	/** Stream for sending objects */
 	ObjectOutputStream outObjectStream;
 	
+	
+	/** Connection handler this listener is associated to */
 	ServerConnectionHandler connectionHandler;
 	
-	BufferedReader inStream;
-	PrintStream outStream;
-	
+	/** The only instance of an image for easy deallocation and to prevent memory leaks */
 	BufferedImage bimage;
 	
+	/** If false the program will terminate the thread for listening for messages*/
 	boolean stop;
 	
+	
+	
+	
+	/**Creates and instance of a listener and opens input and output streams.
+	 * 
+	 * @param clientSocket - client socket
+	 * @param connectionHandler - handler responsible for creating this instance
+	 */
 	public ServerConnectionListener(Socket clientSocket, ServerConnectionHandler connectionHandler) {
 		this.clientSocket = clientSocket;
 		this.connectionHandler = connectionHandler;
@@ -44,6 +58,10 @@ public class ServerConnectionListener extends Thread {
 	
 	
 	
+	
+	/**
+	 * Opens input object stream and output object stream for future communication
+	 */
 	private void openStreams() {
 		try {
 			System.out.println("Opening object output stream.");
@@ -60,7 +78,9 @@ public class ServerConnectionListener extends Thread {
 	}
 
 
-
+	/**
+	 * Cycle for receiving messages
+	 */
 	public void run() {
 		stop = false;
 		NetworkMessage msg;
@@ -84,6 +104,10 @@ public class ServerConnectionListener extends Thread {
 	}
 	
 	
+	/**Parses received message.
+	 * 
+	 * @param msg - received message
+	 */
 	private void parseMessage(NetworkMessage msg) {
 		System.out.println("Received message.");
 		
@@ -106,7 +130,11 @@ public class ServerConnectionListener extends Thread {
 		
 	}
 	
-	
+	/**If image is received, this method will save it to an archive and 
+	 * to a file that is currently being showed on the website. 
+	 * 
+	 * @param msg - message containing the image
+	 */
 	private void imgReceived(NetworkMessage msg){
 		ImageIcon icon = msg.getImageIcon();
 		try {
@@ -127,12 +155,20 @@ public class ServerConnectionListener extends Thread {
 		}
 	}
 	
+	/**Not needed - Not implemented
+	 * (Might be in the future extension)
+	 * 
+	 * @param command
+	 */
 	private void cmdReceived(String command){
-		//TODO n
-		
 	}
 	
 	
+	/**Transforms ImageIcon to BufferedImage
+	 * 
+	 * @param icon - ImageIcon to be transformed
+	 * @return BufferedImage taken from imageicon
+	 */
 	public BufferedImage toBufferedImage(ImageIcon icon)
 	{
 		BufferedImage bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_RGB);
@@ -145,17 +181,19 @@ public class ServerConnectionListener extends Thread {
 	
 	
 	
-	
+	/**
+	 * Closes all streams and the socket itself.
+	 */
 	private void close(){
 		System.out.println("Logging out.");
 		try { 
 			System.out.println("Closing output stream.");
-			if(outStream != null) outStream.close();
+			if(outObjectStream != null) outObjectStream.close();
 		}
 		catch(Exception e) {}
 		try {
 			System.out.println("Closing input stream.");
-			if(inStream != null) inStream.close();
+			if(inObjectStream != null) inObjectStream.close();
 		}
 		catch(Exception e) {};
 		try {
