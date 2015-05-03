@@ -1,7 +1,6 @@
 package security;
 
 import java.awt.image.BufferedImage;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**Holds date of event and picture of the event
@@ -39,9 +38,5 @@ public class SecurityEvent {
 		this.eventTime = eventTime;
 	}
 	
-	@Override
-	public String toString() {
-		SimpleDateFormat sdf = new SimpleDateFormat("kk.MM.ss");
-		return (sdf.format(eventTime));
-	}
+	
 }

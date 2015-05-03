@@ -48,8 +48,6 @@ public class Main {
 	/** Scanner for user input */
 	static Scanner sc;
 	
-	/** Reference to a GIU */
-	static GUI gui;
 	
 	/**Call all the necessary methods to start the application
 	 * 
@@ -82,9 +80,7 @@ public class Main {
 		
 		detectMotion(webcam);
 		
-		if(settings.isGui()){
-			gui = new GUI("Security Panel", webcam);
-		}
+		if(settings.isGui()) new GUI("Security Panel", webcam);
 		else{
 			System.out.println("Running...");
 		}
@@ -265,20 +261,14 @@ public class Main {
 			
 			@Override
 			public void motionDetected(WebcamMotionEvent arg0) {
-				BufferedImage image = webcam.getImage();
-				
-				
-				SecurityEvent event = new SecurityEvent(image, new Date());
-				
-				if(gui != null) gui.addEvent(event);
 				
 				if(settings.isSend()){
-					clientHandler.getConnectionListener().sendPicture(new ImageIcon(image));
+					clientHandler.getConnectionListener().sendPicture(new ImageIcon(webcam.getImage()));
 				}else{
 					try {
 						Date date = new Date();
 						SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy---kk-mm-ss");
-						ImageIO.write(image, "jpg", new File("./pictures/" + dateFormat.format(date) + ".jpg"));
+						ImageIO.write(webcam.getImage(), "jpg", new File("./pictures/" + dateFormat.format(date) + ".jpg"));
 						System.out.println("Image saved.");
 					} catch (IOException e) {
 						System.out.println("(-) Failed to save the image.");
