@@ -191,7 +191,6 @@ public class GUI extends JFrame {
         gbc.weighty = 1;
         gbc.insets = new Insets(10, 10, 10, 10);
 		controlPanel.add(scrollPane, gbc);
-		
 	}
 	
 	/**Adds event to the list
