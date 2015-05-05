@@ -1,35 +1,21 @@
-package client;
+package server;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Scanner;
 
-import security.Main;
-import server.NetworkMessage;
-
-/**Provides command prompt for sending command to the server
- * 
- * @author Matej Kares, karesm@students.zcu.cz
- *
- */
-public class ClientCommandPrompt extends Thread {
-
+public class ServerCommandPrompt extends Thread {
 	/** Scanner for user input */
-	private Scanner sc;
+	Scanner sc;
 	
-	/** Output object stream for sending commands */
-	private ObjectOutputStream outObjectStream;
+	ObjectOutputStream outObjectStream;
 	
-	/**Constructor
-	 * 
-	 * @param outObjectStream
-	 */
-	public ClientCommandPrompt(ObjectOutputStream outObjectStream) {
+	public ServerCommandPrompt(ObjectOutputStream outObjectStream) {
 		this.outObjectStream = outObjectStream;
 	}
 	
 	/**
-	 * Cycle for reading user input and sending messages to the server.
+	 * Cycle for reading user input and sending messages to the client.
 	 */
 	@Override
 	public void run() {
@@ -48,16 +34,21 @@ public class ClientCommandPrompt extends Thread {
 		}
 	}
 	
+	
 	/**
 	 * Shows the list of available command to the user.
 	 */
 	private void showHelp() {
 		System.out.println("-------------------------------");
-		System.out.println("help"); 
+		System.out.println("cam stop \t - stops the camera feed.");
+		System.out.println("cam start \t - starts/resumes the camera feed.");
+		System.out.println("pin stop \t - stops the GPIO detection.");
+		System.out.println("pin start \t - starts the GPIO detecton.");
 		System.out.println("-------------------------------");
 	}
-
-	/**Sends the command to the server.
+	
+	
+	/**Sends the command to the client.
 	 * 
 	 * @param command
 	 */

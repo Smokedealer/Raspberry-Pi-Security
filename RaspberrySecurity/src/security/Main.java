@@ -18,6 +18,13 @@ import com.github.sarxos.webcam.WebcamMotionDetector;
 import com.github.sarxos.webcam.WebcamMotionEvent;
 import com.github.sarxos.webcam.WebcamMotionListener;
 import com.github.sarxos.webcam.ds.v4l4j.V4l4jDriver;
+import com.pi4j.io.gpio.GpioController;
+import com.pi4j.io.gpio.GpioFactory;
+import com.pi4j.io.gpio.GpioPinDigitalInput;
+import com.pi4j.io.gpio.PinPullResistance;
+import com.pi4j.io.gpio.RaspiPin;
+import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
+import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 
 
 /**The core of the application. Handles the user settings, motion detection and offers GUI.
@@ -33,7 +40,7 @@ public class Main {
 	static {
 		/*Uncomment on Raspberry Pi. Comment else.*/
 		
-	    //Webcam.setDriver(new V4l4jDriver());
+	    Webcam.setDriver(new V4l4jDriver());
 	}
 	
 	/** Folder for pictures to be saved while not connected to the server */
@@ -48,6 +55,17 @@ public class Main {
 	/** Scanner for user input */
 	static Scanner sc;
 	
+	/** Webcam for the whole project */
+	static Webcam webcam;
+	
+	
+	/** Whether to check for changes on GPIO or not */
+	static boolean gpioSecure;
+	
+	
+	/** Whether to react to camera input or not */
+	static boolean camSecure;
+	
 	
 	/**Call all the necessary methods to start the application
 	 * 
@@ -57,7 +75,7 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 		sc = new Scanner(System.in);
 		
-		Webcam webcam = Webcam.getDefault();
+		webcam = Webcam.getDefault();
 		
 		if (webcam != null) {
 			System.out.println("Webcam: " + webcam.getName());
@@ -82,16 +100,41 @@ public class Main {
 			
 		webcam.open();
 		
+		setDoorControl();
 		detectMotion(webcam);
 		
 		if(settings.isGui()) new GUI("Security Panel", webcam);
 		else{
 			System.out.println("Running...");
+			
 		}
 	}
 	
 	
 	
+	private static void setDoorControl() {
+		
+		final GpioController gpio = GpioFactory.getInstance();
+		
+		final GpioPinDigitalInput door = gpio.provisionDigitalInputPin(RaspiPin.GPIO_29, PinPullResistance.PULL_DOWN);
+		
+		
+		door.addListener(new GpioPinListenerDigital() {
+			@Override
+			public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent arg0) {
+				if(!gpioSecure) return;
+				System.out.println("Circuit state changed!");
+				if(settings.send){
+					clientHandler.getCommandPrompt().sendCommand("int " + arg0.getPin() + " " + arg0.getState());
+				}else{
+					System.out.println("int " + arg0.getPin() + " " + arg0.getState());
+				}
+			}
+		});
+	}
+
+
+
 	/**Loads the preset settings
 	 * 
 	 * @param webcam
@@ -265,6 +308,7 @@ public class Main {
 			
 			@Override
 			public void motionDetected(WebcamMotionEvent arg0) {
+				if(!camSecure)return;
 				
 				if(settings.isSend()){
 					clientHandler.getConnectionListener().sendPicture(new ImageIcon(webcam.getImage()));
@@ -294,6 +338,35 @@ public class Main {
 		Main.settings = settings;
 	}
 
-	
+
+
+	public static Webcam getWebcam() {
+		return webcam;
+	}
+
+
+
+	public static boolean isGpioSecure() {
+		return gpioSecure;
+	}
+
+
+
+	public static void setGpioSecure(boolean gpioSecure) {
+		Main.gpioSecure = gpioSecure;
+	}
+
+
+
+	public static boolean isCamSecure() {
+		return camSecure;
+	}
+
+
+
+	public static void setCamSecure(boolean camSecure) {
+		Main.camSecure = camSecure;
+	}
+
 	
 }

@@ -14,6 +14,7 @@ import java.io.Serializable;
  * 
  * @author Matej Kares, karesm@students.zcu.cz
  *
+ *	
  */
 public class StartupSettings implements Serializable {
 	/**
@@ -54,11 +55,11 @@ public class StartupSettings implements Serializable {
 			loader.close();
 			return ret;
 		} catch (FileNotFoundException e) {
-			System.out.println("Init file does not exist.");
+			System.out.println("(-) Settings file does not exist.");
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("(-) Failed to load settings file.");
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			System.out.println("(-) Failed to load settings file.");
 		}
 		return null;
 	}
@@ -72,10 +73,9 @@ public class StartupSettings implements Serializable {
 			ObjectOutputStream saver = new ObjectOutputStream(new FileOutputStream(new File(iniFile)));
 			saver.writeObject(this);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			System.out.println("(-) Settings file does not exist.");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("(-) Failed to save settings file.");
 		}
 	}
 

@@ -56,7 +56,9 @@ public class ClientConnectionListener extends Thread {
 				
 			} catch (ClassNotFoundException e) {
 				System.out.println("(-) Could not convert received object.");
+				close();
 			} catch (IOException e) {
+				close();
 				System.out.println("(-) Error reading stream.");
 			}
 		}
@@ -94,7 +96,18 @@ public class ClientConnectionListener extends Thread {
 	private void parseMessage(NetworkMessage msg) {
 		if(msg.getMsgType() != NetworkMessage.COMMAND) return;
 		
-		//Not used, only for future expansions
+		if(msg.getCommand().equals("cam stop")){
+			System.out.println("Stopping the camera.");
+			Main.setCamSecure(false);
+		}else if(msg.getCommand().equals("cam start")){
+			Main.setCamSecure(true);
+		}else if(msg.getCommand().equals("pin stop")){
+			Main.setGpioSecure(false);
+		}else if(msg.getCommand().equals("pin start")){
+			Main.setGpioSecure(true);
+		}else{
+			System.out.println("Command not recognised.");
+		}
 	}
 
 

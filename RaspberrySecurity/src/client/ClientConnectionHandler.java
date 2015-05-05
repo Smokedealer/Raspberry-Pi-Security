@@ -37,6 +37,8 @@ public class ClientConnectionHandler{
 	/** Associated listener */
 	private ClientConnectionListener connectionListener;
 	
+	private ClientCommandPrompt commandPrompt;
+	
 	/**Constructor
 	 * 
 	 * @param host
@@ -66,7 +68,9 @@ public class ClientConnectionHandler{
 			connectionListener = new ClientConnectionListener(this);
 			connectionListener.start();
 			
-			new ClientCommandPrompt(outObjectStream).start();
+			commandPrompt = new ClientCommandPrompt(outObjectStream);
+			commandPrompt.start();
+			
 			return true;
 		} catch (IOException e) {
 			System.out.println("(-) Could not connect to the " + host + ":" + port);
@@ -141,6 +145,16 @@ public class ClientConnectionHandler{
 
 	public void setConnectionListener(ClientConnectionListener connectionListener) {
 		this.connectionListener = connectionListener;
+	}
+
+
+	public ClientCommandPrompt getCommandPrompt() {
+		return commandPrompt;
+	}
+
+
+	public void setCommandPrompt(ClientCommandPrompt commandPrompt) {
+		this.commandPrompt = commandPrompt;
 	}
 	
 	
