@@ -22,7 +22,7 @@ public class ServerCommandPrompt extends Thread {
 		sc = new Scanner(System.in);
 		
 		while(true){
-			System.out.print("RPi Security Client >");
+			System.out.print("RPi Security Server >");
 			String command = sc.nextLine();
 			
 			if(command.equals("help") || command.equals("h")){

@@ -74,6 +74,7 @@ public class ServerConnectionHandler{
 				System.out.println("Starting connection listener.");
 				new ServerConnectionListener(newClient, this).start();
 				
+				
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

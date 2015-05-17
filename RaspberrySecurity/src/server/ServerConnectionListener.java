@@ -1,16 +1,17 @@
 package server;
 
 import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -41,7 +42,8 @@ public class ServerConnectionListener extends Thread {
 	/** If false the program will terminate the thread for listening for messages*/
 	boolean stop;
 	
-	
+	/** Output file containing all recorded events. */
+	File log = new File("events.log");
 	
 	
 	/**Creates and instance of a listener and opens input and output streams.
@@ -54,6 +56,8 @@ public class ServerConnectionListener extends Thread {
 		this.connectionHandler = connectionHandler;
 		
 		openStreams();
+	
+		new ServerCommandPrompt(outObjectStream).start();;
 	}
 	
 	
@@ -148,6 +152,7 @@ public class ServerConnectionListener extends Thread {
 			File archivePath = new File(connectionHandler.getWwwPath() + "archive/" + (folderFormat.format(msg.getDate())) + "/" + (fileFormat.format(msg.getDate())) + ".png");
 			archivePath.mkdirs();
 			ImageIO.write(buffImg, "png", archivePath);
+			logEvent("Movement detected.");
 			System.out.println("(+) Picture succesfully saved.");
 		} catch (IOException e) {
 			System.out.println("(-) Error converting incoming message.");
@@ -155,12 +160,11 @@ public class ServerConnectionListener extends Thread {
 		}
 	}
 	
-	/**Not needed - Not implemented
-	 * (Might be in the future extension)
-	 * 
+	/**Logs the event detected on GPIO
 	 * @param command
 	 */
 	private void cmdReceived(String command){
+		logEvent("Pin detected change of it's state: " + command);
 	}
 	
 	
@@ -179,6 +183,21 @@ public class ServerConnectionListener extends Thread {
 			return bi;
 	}
 	
+	/**Logs the event with time and short description.
+	 * 
+	 * @param msg
+	 */
+	private void logEvent(String msg){
+		try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(log, true)))) {
+			Date date = new Date();
+			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy kk:mm:ss - ");
+			
+			
+		    out.println(sdf.format(date) + msg);
+		}catch (IOException e) {
+			System.out.println("(-) failed to write to the log file.");
+		}
+	}
 	
 	
 	/**
